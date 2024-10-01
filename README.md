@@ -31,7 +31,7 @@ Follow the steps below to smoothly run the Blog Platform project.
 
 4. Access the Application:
    - Open a web browser and navigate to the web application URL:
-     - For XAMPP: http://localhost/blog_platform
+     - For XAMPP: http://localhost/blog_platform/index.php
      
 
 ---
