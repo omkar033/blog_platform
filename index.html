@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Post Editor</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- TinyMCE Editor Script -->
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>
+        // Initialize TinyMCE on the textarea
+        tinymce.init({
+            selector: '#content',
+            menubar: false,
+            plugins: 'autosave link lists image code',
+            toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist | link image | code',
+            autosave_interval: '30s',
+            height: 300
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Create a New Blog Post</h1>
+
+        <!-- Blog Post Form -->
+        <form method="POST" action="submit_post.php">
+            <!-- Post Title Input -->
+            <input type="text" name="title" placeholder="Post Title" required>
+
+            <!-- Blog Post Content with TinyMCE -->
+            <textarea id="content" name="content" placeholder="Write your blog post here..."></textarea>
+
+            <!-- Publish Button -->
+            <button type="submit">Publish</button>
+        </form>
+    </div>
+</body>
+</html>

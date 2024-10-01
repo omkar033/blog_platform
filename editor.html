@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Editor</title>
+    <script src="https://cdn.tiny.cloud/1/i9o01w5dytrprf4r39y4i3ozdvz8r0cyojh451lfwmpgbz8g/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            max-width: 800px;
+        }
+        h1 {
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #autosave-status {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: green;
+        }
+    </style>
+    <script>
+        tinymce.init({
+            selector: '#content', // This should match your textarea ID
+            setup: function(editor) {
+                editor.on('change keyup', function() {
+                    // Auto-save whenever there's a change in content
+                    autoSaveDraft();
+                });
+            }
+        });
+
+        function autoSaveDraft() {
+            var title = document.querySelector('input[name="title"]').value; // Get title
+            var content = tinymce.get('content').getContent(); // Get content from TinyMCE
+
+            if (!title || !content) {
+                return; // Do not save if either is empty
+            }
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "autosave.php", true); // Ensure the path is correct
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    displaySaveStatus(response.message);
+                }
+            };
+
+            xhr.send("title=" + encodeURIComponent(title) + "&content=" + encodeURIComponent(content));
+        }
+
+        function displaySaveStatus(message) {
+            var statusElement = document.getElementById('autosave-status');
+            if (statusElement) {
+                statusElement.textContent = message; // Display the status message
+                statusElement.style.display = 'block'; // Make it visible
+                setTimeout(function() {
+                    statusElement.style.display = 'none'; // Hide after 5 seconds
+                }, 5000); // Adjust the duration as needed
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('postForm').onsubmit = function(event) {
+                event.preventDefault(); // Prevent default form submission
+                // Handle the form submission here
+                var title = document.querySelector('input[name="title"]').value;
+                var content = tinymce.get('content').getContent();
+                // Send the final post data to your server (e.g., submitPost.php)
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "submitPost.php", true); // Ensure the path is correct
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        alert('Post submitted successfully!'); // Notify user upon successful submission
+                    }
+                };
+                xhr.send("title=" + encodeURIComponent(title) + "&content=" + encodeURIComponent(content));
+            };
+        });
+    </script>
+</head>
+<body>
+    <h1>Create a New Post</h1>
+    <form id="postForm">
+        <label for="title">Title:</label>
+        <input type="text" name="title" required>
+        
+        <label for="content">Content:</label>
+        <textarea id="content" name="content"></textarea>
+        
+        <button type="submit">Submit Post</button>
+        
+        <div id="autosave-status" style="display: none;"></div> <!-- Autosave status message -->
+    </form>
+</body>
+</html>
